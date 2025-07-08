@@ -1,0 +1,12 @@
+[
+  {
+    "image": "images/0.png",
+    "label": "cat",
+    "result": "correct"
+  },
+  {
+    "image": "images/1.png",
+    "label": "dog",
+    "result": "wrong"
+  }
+]

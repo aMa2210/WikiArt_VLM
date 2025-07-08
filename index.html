@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Image Viewer by Label</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .image-box { display: inline-block; margin: 10px; border: 3px solid #ccc; padding: 5px; }
+    .correct { border-color: green; }
+    .wrong { border-color: red; }
+    img { max-width: 150px; max-height: 150px; }
+  </style>
+</head>
+<body>
+  <h1>Image Viewer</h1>
+  <label for="labelSelect">Filter by label:</label>
+  <select id="labelSelect">
+    <option value="all">All</option>
+  </select>
+  <div id="imageContainer"></div>
+
+  <script>
+    let allData = [];
+
+    async function loadData() {
+      const res = await fetch('data.json');
+      allData = await res.json();
+      populateLabels();
+      displayImages('all');
+    }
+
+    function populateLabels() {
+      const labels = Array.from(new Set(allData.map(d => d.label)));
+      const select = document.getElementById('labelSelect');
+      labels.forEach(label => {
+        const option = document.createElement('option');
+        option.value = label;
+        option.textContent = label;
+        select.appendChild(option);
+      });
+
+      select.addEventListener('change', () => {
+        displayImages(select.value);
+      });
+    }
+
+    function displayImages(label) {
+      const container = document.getElementById('imageContainer');
+      container.innerHTML = '';
+      const filtered = (label === 'all') ? allData : allData.filter(d => d.label === label);
+      filtered.forEach(item => {
+        const div = document.createElement('div');
+        div.className = `image-box ${item.result}`;
+        const img = document.createElement('img');
+        img.src = item.image;
+        const p = document.createElement('p');
+        p.textContent = `${item.label} (${item.result})`;
+        div.appendChild(img);
+        div.appendChild(p);
+        container.appendChild(div);
+      });
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
