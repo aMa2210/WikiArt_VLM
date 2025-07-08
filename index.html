@@ -15,6 +15,9 @@
 <body>
   <h1>Wikiart Image Viewer</h1>
 
+  <label for="modelSelect">Model:</label>
+  <select id="modelSelect"><option value="all">All</option><option value="Original" selected>Original</option></select>
+
   <label for="artistSelect">Artist:</label>
   <select id="artistSelect"><option value="all">All</option></select>
 
@@ -33,19 +36,18 @@
       const res = await fetch('data.json');
       allData = await res.json();
 
+      populateSelect('model');
       populateSelect('artist');
       populateSelect('genre');
       populateSelect('style');
 
       applyFilters();
 
-      // 绑定事件，筛选触发
-      ['artistSelect', 'genreSelect', 'styleSelect'].forEach(id => {
+      ['modelSelect', 'artistSelect', 'genreSelect', 'styleSelect'].forEach(id => {
         document.getElementById(id).addEventListener('change', applyFilters);
       });
     }
 
-    // 给指定字段生成对应的下拉选项
     function populateSelect(field) {
       const select = document.getElementById(field + 'Select');
       const values = Array.from(new Set(allData.map(d => d[field]))).sort();
@@ -57,13 +59,14 @@
       });
     }
 
-    // 根据当前三个下拉选的值过滤数据
     function applyFilters() {
+      const model = document.getElementById('modelSelect').value;
       const artist = document.getElementById('artistSelect').value;
       const genre = document.getElementById('genreSelect').value;
       const style = document.getElementById('styleSelect').value;
 
       const filtered = allData.filter(d =>
+        (model === 'all' || d.model === model) &&
         (artist === 'all' || d.artist === artist) &&
         (genre === 'all' || d.genre === genre) &&
         (style === 'all' || d.style === style)
@@ -72,7 +75,6 @@
       displayImages(filtered);
     }
 
-    // 展示图片
     function displayImages(data) {
       const container = document.getElementById('imageContainer');
       container.innerHTML = '';
@@ -86,7 +88,7 @@
         const img = document.createElement('img');
         img.src = item.image;
         const p = document.createElement('p');
-        p.textContent = `${item.artist} | ${item.genre} | ${item.style} (${item.result})`;
+        p.innerText = `${item.model} | ${item.artist}\n${item.genre} | ${item.style} | (${item.result})`;
         div.appendChild(img);
         div.appendChild(p);
         container.appendChild(div);

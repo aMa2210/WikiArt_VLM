@@ -1,6 +1,7 @@
 [
   {
     "image": "images/0.png",
+    "model": "Original",
     "artist": "Van Gogh",
     "genre": "Landscape",
     "style": "Post-Impressionism",
@@ -8,6 +9,7 @@
   },
   {
     "image": "images/1.png",
+    "model": "Original",
     "artist": "Picasso",
     "genre": "Portrait",
     "style": "Cubism",
