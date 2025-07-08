@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Image Viewer by Label</title>
+  <meta charset="UTF-8" />
+  <title>Image Viewer by Multiple Labels</title>
   <style>
     body { font-family: sans-serif; padding: 20px; }
     .image-box { display: inline-block; margin: 10px; border: 3px solid #ccc; padding: 5px; }
     .correct { border-color: green; }
     .wrong { border-color: red; }
     img { max-width: 150px; max-height: 150px; }
+    label { margin-right: 10px; }
   </style>
 </head>
 <body>
   <h1>Wikiart Image Viewer</h1>
- <label for="artistSelect">Artist:</label>
+
+  <label for="artistSelect">Artist:</label>
   <select id="artistSelect"><option value="all">All</option></select>
 
   <label for="genreSelect">Genre:</label>
@@ -30,36 +32,61 @@
     async function loadData() {
       const res = await fetch('data.json');
       allData = await res.json();
-      populateLabels();
-      displayImages('all');
+
+      populateSelect('artist');
+      populateSelect('genre');
+      populateSelect('style');
+
+      applyFilters();
+
+      // 绑定事件，筛选触发
+      ['artistSelect', 'genreSelect', 'styleSelect'].forEach(id => {
+        document.getElementById(id).addEventListener('change', applyFilters);
+      });
     }
 
-    function populateLabels() {
-      const labels = Array.from(new Set(allData.map(d => d.label)));
-      const select = document.getElementById('labelSelect');
-      labels.forEach(label => {
+    // 给指定字段生成对应的下拉选项
+    function populateSelect(field) {
+      const select = document.getElementById(field + 'Select');
+      const values = Array.from(new Set(allData.map(d => d[field]))).sort();
+      values.forEach(v => {
         const option = document.createElement('option');
-        option.value = label;
-        option.textContent = label;
+        option.value = v;
+        option.textContent = v;
         select.appendChild(option);
       });
-
-      select.addEventListener('change', () => {
-        displayImages(select.value);
-      });
     }
 
-    function displayImages(label) {
+    // 根据当前三个下拉选的值过滤数据
+    function applyFilters() {
+      const artist = document.getElementById('artistSelect').value;
+      const genre = document.getElementById('genreSelect').value;
+      const style = document.getElementById('styleSelect').value;
+
+      const filtered = allData.filter(d =>
+        (artist === 'all' || d.artist === artist) &&
+        (genre === 'all' || d.genre === genre) &&
+        (style === 'all' || d.style === style)
+      );
+
+      displayImages(filtered);
+    }
+
+    // 展示图片
+    function displayImages(data) {
       const container = document.getElementById('imageContainer');
       container.innerHTML = '';
-      const filtered = (label === 'all') ? allData : allData.filter(d => d.label === label);
-      filtered.forEach(item => {
+      if(data.length === 0) {
+        container.textContent = 'No images found for selected filters.';
+        return;
+      }
+      data.forEach(item => {
         const div = document.createElement('div');
         div.className = `image-box ${item.result}`;
         const img = document.createElement('img');
         img.src = item.image;
         const p = document.createElement('p');
-        p.textContent = `${item.label} (${item.result})`;
+        p.textContent = `${item.artist} | ${item.genre} | ${item.style} (${item.result})`;
         div.appendChild(img);
         div.appendChild(p);
         container.appendChild(div);
