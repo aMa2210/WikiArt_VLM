@@ -1,12 +1,16 @@
 [
   {
     "image": "images/0.png",
-    "label": "cat",
+    "artist": "Van Gogh",
+    "genre": "Landscape",
+    "style": "Post-Impressionism",
     "result": "correct"
   },
   {
     "image": "images/1.png",
-    "label": "dog",
+    "artist": "Picasso",
+    "genre": "Portrait",
+    "style": "Cubism",
     "result": "wrong"
   }
 ]
